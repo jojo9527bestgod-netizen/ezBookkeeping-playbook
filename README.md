@@ -1,4 +1,4 @@
-# ezBookkeeping 分类表
+# ezBookkeeping Playbook
 
 > 来源：本地 ezBookkeeping 当前“支出 > 交易分类”页面抓取
 
