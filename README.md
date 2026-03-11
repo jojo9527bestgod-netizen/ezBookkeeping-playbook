@@ -2,6 +2,32 @@
 
 > 来源：本地 ezBookkeeping 当前“支出 > 交易分类”页面抓取
 
+## 依赖与前提
+
+这套记账/分类流程默认依赖以下环境：
+
+- **ezBookkeeping 服务可访问**：默认 `http://localhost:8080`
+- **已存在可登录账号**：当前记录使用的本地账号是 `jojo9527`
+- **Agent Browser 可用**：用于前端页面操作、读取 localStorage、辅助排障
+- **Docker 可用**：当前 ezBookkeeping 运行在 Docker 容器中，容器名为 `ezbookkeeping`
+- **后端接口可访问**：用于新增后核验、按 `categoryId` 直接修正分类
+
+### 当前实际工具链
+
+- OpenClaw skill：`Agent Browser`
+- 浏览器控制：`agent-browser`
+- 容器管理：`docker`
+- 账本服务：`mayswind/ezbookkeeping`
+
+### 说明
+
+- 仅有分类表还不够；真正稳定执行“记录 + 分类 + 核验”，需要同时具备：
+  1. ezBookkeeping 可登录
+  2. token 可正常生成
+  3. 数据库文件可写
+  4. Agent Browser / Docker 可正常工作
+- 如果其中任一环节异常，前端可能看起来能打开，但实际无法稳定记账或改分类。
+
 ## 一级分类 → 二级分类
 
 ### 食品饮料
