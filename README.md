@@ -1,6 +1,31 @@
 # ezBookkeeping Playbook
 
-> 来源：本地 ezBookkeeping 当前“支出 > 交易分类”页面抓取
+> 来源：本地 ezBookkeeping 当前"支出 > 交易分类"页面抓取
+
+## Docker 部署（必须用 volume 持久化！）
+
+**重要：每次部署新容器必须用 `-v` 挂载 volume，否则删容器=删数据！**
+
+```bash
+# 正确部署方式
+docker run -d --name ezbookkeeping -p 8080:8080 -v ~/ezbookkeeping-data:/ezbookkeeping/data mayswind/ezbookkeeping
+
+# 数据位置
+~/ezbookkeeping-data/ezbookkeeping.db
+
+# 常用命令
+docker restart ezbookkeeping  # 重启
+docker logs ezbookkeeping      # 查看日志
+```
+
+### 账号信息
+
+- 用户名：`jojo9527`
+- 密码：`Jojo@2026ez!`
+- 语言：中文（zh-Hans）
+- 货币：CNY
+
+---
 
 ## 依赖与前提
 
@@ -21,7 +46,7 @@
 
 ### 说明
 
-- 仅有分类表还不够；真正稳定执行“记录 + 分类 + 核验”，需要同时具备：
+- 仅有分类表还不够；真正稳定执行"记录 + 分类 + 核验"，需要同时具备：
   1. ezBookkeeping 可登录
   2. token 可正常生成
   3. 数据库文件可写
@@ -107,7 +132,7 @@
 - 话费 → 电话费
 - 网费 → 上网费
 
-> 后续可继续扩充成“常见描述 → 推荐分类”的完整映射表。
+> 后续可继续扩充成"常见描述 → 推荐分类"的完整映射表。
 
 ---
 
@@ -181,7 +206,7 @@ Content-Type: application/json
 ```
 
 说明：
-- 金额以“分”为单位（如 `1600` = ¥16.00）
+- 金额以"分"为单位（如 `1600` = ¥16.00）
 - `categoryId` 改成目标分类的 id 即可完成分类修正
 - 比起前端下拉框操作，直接走这个接口更稳
 
@@ -199,7 +224,7 @@ Content-Type: application/json
 
 ## 本次已确认坑位
 
-- 曾出现“数据已改进数据库，但前端长时间不显示”的情况。
+- 曾出现"数据已改进数据库，但前端长时间不显示"的情况。
 - 原因不是数据没写进去，而是容器仍占用旧数据库状态，导致前端没有及时读到新内容。
 - 处理方式：修正数据库写权限后，重启 `ezbookkeeping` 容器。
-- 结论：以后以“后端核验优先，前端显示次之”为准。
+- 结论：以后以"后端核验优先，前端显示次之"为准。
