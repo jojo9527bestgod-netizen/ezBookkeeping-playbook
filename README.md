@@ -170,6 +170,41 @@ POST /api/v1/transactions/modify.json
 
 ---
 
+
+
+### 新增交易
+```http
+POST /api/v1/transactions/add.json
+```
+
+**关键发现**：必须添加 `type: 3` 参数（实测有效）
+
+请求体格式：
+```json
+{
+  "type": 3,
+  "categoryId": "<分类ID>",
+  "sourceAccountId": "<账户ID>",
+  "destinationAccountId": "0",
+  "time": <时间戳>,
+  "utcOffset": 480,
+  "sourceAmount": <金额(分)>,
+  "destinationAmount": 0,
+  "hideAmount": false,
+  "tagIds": [],
+  "pictureIds": [],
+  "comment": "<备注>"
+}
+```
+
+**注意**：
+- `type: 3` 是支出类型（实测）
+- 金额单位是**分**（如 `1200` = ¥12.00）
+- `time` 使用 Unix 时间戳（秒）
+- 写入后建议立即用 `transactions/list/by_month.json` 验证
+
+---
+
 ## 调用接口时需要的关键请求头
 
 ```http
