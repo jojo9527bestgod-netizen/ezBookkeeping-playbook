@@ -263,3 +263,64 @@ Content-Type: application/json
 - 原因不是数据没写进去，而是容器仍占用旧数据库状态，导致前端没有及时读到新内容。
 - 处理方式：修正数据库写权限后，重启 `ezbookkeeping` 容器。
 - 结论：以后以"后端核验优先，前端显示次之"为准。
+
+---
+
+## 数据备份（重要！）
+
+### 备份位置
+- 备份目录：`~/ezbookkeeping-data/backups/`
+- 文件格式：`ezbookkeeping_YYYYMMDD_HHMMSS.db`
+
+### 自动备份机制（双重保护）
+
+#### 1. 定时备份（cron）
+- 每3天凌晨3点执行（电脑开着才执行）
+- 保留最近10个备份
+
+#### 2. 事件备份（launchd）
+- **开机时**自动执行
+- **唤醒时**自动执行
+- 即使合盖睡眠也不会丢失备份机会
+
+### 备份脚本位置
+```bash
+/Users/dora/.openclaw/workspace-assi/scripts/backup_ezbookkeeping.py
+```
+
+### 手动备份
+```bash
+python3 /Users/dora/.openclaw/workspace-assi/scripts/backup_ezbookkeeping.py
+```
+
+### 恢复数据
+
+如果数据出问题，按以下步骤恢复：
+
+```bash
+# 1. 停止 ezBookkeeping
+docker stop ezbookkeeping
+
+# 2. 找到备份文件（最新的）
+ls -la ~/ezbookkeeping-data/backups/
+
+# 3. 替换数据库（选一个备份文件）
+cp ~/ezbookkeeping-data/backups/ezbookkeeping_20260317_235044.db ~/ezbookkeeping-data/ezbookkeeping.db
+
+# 4. 重启 ezBookkeeping
+docker start ezbookkeeping
+```
+
+### 备份文件兼容性
+- 备份是标准 SQLite 数据库
+- 可用以下工具查看：
+  - `sqlite3` 命令行
+  - DB Browser for SQLite（图形界面）
+  - Python pandas 导出 Excel：
+    ```python
+    import pandas as pd
+    import sqlite3
+    conn = sqlite3.connect('~/ezbookkeeping-data/ezbookkeeping.db')
+    df = pd.read_sql_query('SELECT * FROM "transaction"', conn)
+    df.to_excel('backup.xlsx', index=False)
+    ```
