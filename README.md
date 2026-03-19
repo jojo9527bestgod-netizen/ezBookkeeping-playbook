@@ -324,3 +324,22 @@ docker start ezbookkeeping
     df = pd.read_sql_query('SELECT * FROM "transaction"', conn)
     df.to_excel('backup.xlsx', index=False)
     ```
+
+---
+
+## 记账回复格式
+
+每次记录完成后，按以下格式回复用户：
+
+```
+已记录：
+- **日期**：YYYY年M月D日（今天/昨天/明天）
+- **分类**：<分类名称>
+- **金额**：X 元
+- **描述**：<备注>
+```
+
+**注意**：
+- 日期后需要标注"今天"、"昨天"或"明天"
+- 金额单位是元，不是分
+- 描述即 comment 字段
