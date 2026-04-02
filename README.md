@@ -343,3 +343,63 @@ docker start ezbookkeeping
 - 日期后需要标注"今天"、"昨天"或"明天"
 - 金额单位是元，不是分
 - 描述即 comment 字段
+
+---
+
+## 记账核验规则（必须执行）
+
+每次添加记录后，必须完整核验以下四项：
+
+### 核验清单
+
+| 字段 | 来源 | 说明 |
+|------|------|------|
+| 日期 | `time` 时间戳 | 用 `date -r <timestamp>` 转换为可读日期 |
+| 分类 | `categoryId` | 需对照分类列表确认名称 |
+| 金额 | `sourceAmount` | 单位是**分**，除以100得到元 |
+| 描述 | `comment` | 直接核对文字 |
+
+### 核验命令
+
+**1. 查询单条记录**
+```bash
+curl -s 'http://localhost:8080/api/v1/transactions/get.json?id=<ID>&trim_account=true&trim_category=true&trim_tag=true' \
+  -H 'Authorization: Bearer <token>' \
+  -H 'Accept-Language: zh-Hans' \
+  -H 'X-Timezone-Offset: 480' \
+  -H 'X-Timezone-Name: Asia/Shanghai'
+```
+
+**2. 查询当月记录（核对最新几条）**
+```bash
+curl -s 'http://localhost:8080/api/v1/transactions/list/by_month.json?year=2026&month=4&type=0&trim_account=true&trim_category=true&trim_tag=true' \
+  -H 'Authorization: Bearer <token>' \
+  -H 'Accept-Language: zh-Hans' \
+  -H 'X-Timezone-Offset: 480' \
+  -H 'X-Timezone-Name: Asia/Shanghai'
+```
+
+**3. 时间戳转换**
+```bash
+date -r 1775037600   # 转换为可读日期
+```
+
+### 核验示例
+
+添加一条"打羽毛球22元"记录后：
+
+```json
+{
+  "id": "3812000749408223232",
+  "categoryId": "3808164190548394016",
+  "time": 1775037600,
+  "sourceAmount": 2200,
+  "comment": "打羽毛球"
+}
+```
+
+核验结果：
+- **日期**：`date -r 1775037600` → Wed Apr 1 18:00:00 CST 2026 ✓
+- **分类**：`3808164190548394016` = 运动健身 ✓
+- **金额**：2200分 = 22元 ✓
+- **描述**：打羽毛球 ✓
